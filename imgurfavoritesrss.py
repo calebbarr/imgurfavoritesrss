@@ -80,7 +80,7 @@ def run():
     t = Thread(target=reactor.run, args=(False,))
     t.daemon = True
     t.start()
-    server.run(port=os.getenv("PORT",5000))
+    server.run(host="0.0.0.0",port=os.getenv("PORT",5000))
 
 if __name__ == '__main__':
     run()
