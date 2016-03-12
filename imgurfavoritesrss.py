@@ -28,11 +28,11 @@ def poll_imgur(users=None):
     print("polling imgur")
     users = favorites.keys() if users is None else users
     for username in users:
-        favorite = getLastFavorite(username)
-        print("last favorite for {username}: {link}".format(username=username,link=favorite.link))
-        if(favorite.link != favorites[username][-1].link):
-            print("found new favorite for {username}: {link}".format(username=username,link=favorite.link))
-            latest_favorite[username].append(favorite)
+        favorite = fetchLastFavorite(username)
+        print("fetched last favorite for {username}: {link}".format(username=username,link=favorite.link))
+        if(favorite.link != favorites[username][-1].link):            
+            print("this is newer than {link}".format(link=favorites[username][-1].link))
+            favorites[username].append(favorite)
     
 def rss_item(img):
     return  """
@@ -44,7 +44,7 @@ def rss_item(img):
         </item>
     """.format(title=img.title,link=img.link,description=img.description,date=img.datetime)
 
-def getLastFavorite(username):
+def fetchLastFavorite(username):
     favorite = client.get_gallery_favorites(username)[0]
     favorite.datetime = datetime.now(pytz.timezone('UTC')).strftime("%a, %d %b %Y %H:%M:%S %z")
     return favorite
@@ -70,7 +70,7 @@ def favorites_rss(username):
     return "\n".join(rss[:-3] + [rss_item(fave) for fave in favorites[username]] + rss[-3:] )
 
 def subscribe(username):
-    favorite = getLastFavorite(username)
+    favorite = fetchLastFavorite(username)
     favorites[username] = [favorite]
     
 def run():
