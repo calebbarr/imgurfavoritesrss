@@ -16,7 +16,7 @@ latest_favorite = {
     # username : link
 }
 
-server = Flask(__name__,host='0.0.0.0',port=int(os.environ.get("PORT", 5000),static_url_path='')
+server = Flask(__name__,static_url_path='')
 
 client_id = os.environ.get('IMGUR_CLIENT_ID')
 client_secret = os.environ.get('IMGUR_CLIENT_SECRET')

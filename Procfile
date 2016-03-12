@@ -1,1 +1,1 @@
-python -m imgurfavoritesrss
+web: python -m imgurfavoritesrss
