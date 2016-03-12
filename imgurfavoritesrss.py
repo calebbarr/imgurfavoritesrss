@@ -45,6 +45,7 @@ def rss_item(img):
 def fetchLastFavorite(username):
     favorite = client.get_gallery_favorites(username)[0]
     favorite.datetime = datetime.now(pytz.timezone('UTC')).strftime("%a, %d %b %Y %H:%M:%S %z")
+    favorite.link = favorite.link[:favorite.link.rfind(".")].replace("i.imgur.com","imgur.com")
     return favorite
     
 def initialize_rss_file(username):
