@@ -6,9 +6,8 @@ from threading import Thread
 from imgurpython import ImgurClient
 import os,sys
 
+
 print = lambda x: sys.stdout.write("%s\n" % x)
-
-
 
 POLL_FREQUENCY = 60 # seconds
 RSS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),"static")
@@ -17,7 +16,7 @@ latest_favorite = {
     # username : link
 }
 
-server = Flask(__name__,static_url_path='',port=33507)
+server = Flask(__name__,host='0.0.0.0',port=int(os.environ.get("PORT", 5000),static_url_path='')
 
 client_id = os.environ.get('IMGUR_CLIENT_ID')
 client_secret = os.environ.get('IMGUR_CLIENT_SECRET')
