@@ -39,7 +39,7 @@ def rss_item(img):
           <title>{title}</title>
           <link>{link}</link>
           <description>{description}</description>
-          <pubDate>{date}<pubDate>
+          <pubDate>{date}</pubDate>
         </item>
     """.format(title=img.title,link=img.link,description=img.description,date=img.datetime)
 
