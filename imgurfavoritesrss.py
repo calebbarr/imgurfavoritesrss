@@ -6,6 +6,7 @@ from threading import Thread
 from imgurpython import ImgurClient
 import os,sys
 from datetime import datetime
+import pytz
 
 
 print = lambda x: sys.stdout.write("%s\n" % x)
@@ -45,7 +46,7 @@ def rss_item(img):
 
 def getLastFavorite(username):
     favorite = client.get_gallery_favorites(username)[0]
-    favorite.datetime = datetime.now().strftime("%a, %d %b %Y %H:%M:%S %z")
+    favorite.datetime = datetime.now(pytz.timezone('UTC')).strftime("%a, %d %b %Y %H:%M:%S %z")
     return favorite
     
 def initialize_rss_file(username):
