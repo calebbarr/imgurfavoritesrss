@@ -23,7 +23,6 @@ client_id = os.environ.get('IMGUR_CLIENT_ID')
 client_secret = os.environ.get('IMGUR_CLIENT_SECRET')
 client = ImgurClient(client_id, client_secret)
 
-
 def poll_imgur(users=None):
     print("polling imgur")
     users = favorites.keys() if users is None else users
@@ -39,7 +38,6 @@ def rss_item(img):
         <item>
           <title>{title}</title>
           <link>{link}</link>
-          <description>{description}</description>
           <pubDate>{date}</pubDate>
         </item>
     """.format(title=img.title,link=img.link,description=img.description,date=img.datetime)
