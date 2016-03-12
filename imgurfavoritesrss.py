@@ -10,10 +10,9 @@ import os,sys
 print = lambda x: sys.stdout.write("%s\n" % x)
 
 POLL_FREQUENCY = 60 # seconds
-RSS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),"static")
 
 latest_favorite = {
-    # username : link
+    # username : img
 }
 
 server = Flask(__name__,static_url_path='')
@@ -28,20 +27,9 @@ def poll_imgur():
     for username in latest_favorite:
         favorite = getLastFavorite(username)
         print("last favorite for {username}: {link}".format(username=username,link=favorite.link))
-        if(favorite.link != latest_favorite[username]):
+        if(favorite.link != latest_favorite[username].link):
             print ("found new favorite for {username}: {link}").format(username=username,link=favorite.link)
-            latest_favorite[username] = favorite.link
-            add_rss_item(username,favorite)
-            
-def add_rss_item(username,img):
-    rss_file = open(os.path.join(RSS_DIR,"{username}.xml".format(username=username)),'r')
-    lines = rss_file.readlines()
-    rss_file.close()
-    rss_file = open(os.path.join(RSS_DIR,"{username}.xml".format(username=username)),'w')
-    rss_file.write("\n".join(lines[:-3]))
-    rss_file.write(rss_item(img))
-    rss_file.write("\n".join(lines[-3:]))
-    rss_file.close()
+            latest_favorite[username] = favorite
     
 def rss_item(img):
     return  """
@@ -56,7 +44,7 @@ def getLastFavorite(username):
     return client.get_gallery_favorites(username)[0]
     
 def initialize_rss_file(username):
-    rss="""
+    return """
     <rss version="2.0">
       <channel>
         <title>{username}'s Imgur Favorites</title>
@@ -64,23 +52,27 @@ def initialize_rss_file(username):
         <description>{username}'s Imgur Favorites ....</description>
       </channel>
     </rss>
-    """.format(username=username)
-    open("{RSS_DIR}/{username}.xml".format(RSS_DIR=RSS_DIR,username=username),'w').write(rss)
+    """.format(username=username).split("\n")
+    
+@server.route('/favorites/<username>', methods=['GET', 'POST'])
+def favorites_rss(username):
+    if not username in latest_favorite:
+        subscribe(username)
+    rss = initialize_rss_file(username)
+    return "\n".join(rss[:-3] + [rss_item(latest_favorite[username])] + rss[-3:] )
 
-@server.route('/subscribe/<username>', methods=['GET', 'POST']) #TODO finish
+@server.route('/subscribe/<username>', methods=['GET', 'POST']) 
 def subscribe(username):
-    initialize_rss_file(username)
     favorite = getLastFavorite(username)
-    latest_favorite[username] = favorite.link
-    add_rss_item(username,favorite)
-    return "subscribed to {username}".format(username=username) #TODO return link to rss file
+    latest_favorite[username] = favorite
+    return "subscribed to {username}.\nto get the RSS file, call \n/favorites/{username}\n".format(username=username)
     
 def run():
     task.LoopingCall(poll_imgur).start(POLL_FREQUENCY)
     t = Thread(target=reactor.run, args=(False,))
     t.daemon = True
     t.start()
-    server.run(host="0.0.0.0",port=os.getenv("PORT",5000))
+    server.run(host="0.0.0.0",port=os.getenv("PORT",5000), debug=os.getenv("PORT") == None)
 
 if __name__ == '__main__':
     run()
