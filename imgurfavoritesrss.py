@@ -23,9 +23,10 @@ client_secret = os.environ.get('IMGUR_CLIENT_SECRET')
 client = ImgurClient(client_id, client_secret)
 
 
-def poll_imgur():
+def poll_imgur(users=None):
     print("polling imgur")
-    for username in favorites:
+    users = favorites.keys() if users is None else users
+    for username in users:
         favorite = getLastFavorite(username)
         print("last favorite for {username}: {link}".format(username=username,link=favorite.link))
         if(favorite.link != favorites[username][-1].link):
@@ -62,6 +63,8 @@ def initialize_rss_file(username):
 def favorites_rss(username):
     if not username in favorites:
         subscribe(username)
+    else:
+        poll_imgur([username])
     rss = initialize_rss_file(username)
     return "\n".join(rss[:-3] + [rss_item(fave) for fave in favorites[username]] + rss[-3:] )
 
