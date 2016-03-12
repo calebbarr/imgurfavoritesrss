@@ -12,8 +12,8 @@ print = lambda x: sys.stdout.write("%s\n" % x)
 
 POLL_FREQUENCY = 60 # seconds
 
-latest_favorite = {
-    # username : img
+favorites = {
+    # username : [imgs]
 }
 
 server = Flask(__name__,static_url_path='')
@@ -25,12 +25,12 @@ client = ImgurClient(client_id, client_secret)
 
 def poll_imgur():
     print("polling imgur")
-    for username in latest_favorite:
+    for username in favorites:
         favorite = getLastFavorite(username)
         print("last favorite for {username}: {link}".format(username=username,link=favorite.link))
-        if(favorite.link != latest_favorite[username].link):
+        if(favorite.link != favorites[username][-1].link):
             print ("found new favorite for {username}: {link}").format(username=username,link=favorite.link)
-            latest_favorite[username] = favorite
+            latest_favorite[username].append(favorite)
     
 def rss_item(img):
     return  """
@@ -38,12 +38,14 @@ def rss_item(img):
           <title>{title}</title>
           <link>{link}</link>
           <description>{description}</description>
-          <pubDate>{now}<pubDate>
+          <pubDate>{date}<pubDate>
         </item>
-    """.format(title=img.title,link=img.link,description=img.description,now=datetime.now().strftime("%a, %d %b %Y %H:%M:%S %z"))
+    """.format(title=img.title,link=img.link,description=img.description,date=img.datetime)
 
 def getLastFavorite(username):
-    return client.get_gallery_favorites(username)[0]
+    favorite = client.get_gallery_favorites(username)[0]
+    favorite.datetime = datetime.now().strftime("%a, %d %b %Y %H:%M:%S %z")
+    return favorite
     
 def initialize_rss_file(username):
     return """
@@ -58,14 +60,14 @@ def initialize_rss_file(username):
     
 @server.route('/<username>', methods=['GET', 'POST'])
 def favorites_rss(username):
-    if not username in latest_favorite:
+    if not username in favorites:
         subscribe(username)
     rss = initialize_rss_file(username)
-    return "\n".join(rss[:-3] + [rss_item(latest_favorite[username])] + rss[-3:] )
+    return "\n".join(rss[:-3] + [rss_item(fave) for fave in favorites[username]] + rss[-3:] )
 
 def subscribe(username):
     favorite = getLastFavorite(username)
-    latest_favorite[username] = favorite
+    favorites[username] = [favorite]
     
 def run():
     task.LoopingCall(poll_imgur).start(POLL_FREQUENCY)
