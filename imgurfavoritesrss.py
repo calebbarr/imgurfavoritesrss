@@ -54,18 +54,16 @@ def initialize_rss_file(username):
     </rss>
     """.format(username=username).split("\n")
     
-@server.route('/favorites/<username>', methods=['GET', 'POST'])
+@server.route('/<username>', methods=['GET', 'POST'])
 def favorites_rss(username):
     if not username in latest_favorite:
         subscribe(username)
     rss = initialize_rss_file(username)
     return "\n".join(rss[:-3] + [rss_item(latest_favorite[username])] + rss[-3:] )
 
-@server.route('/subscribe/<username>', methods=['GET', 'POST']) 
 def subscribe(username):
     favorite = getLastFavorite(username)
     latest_favorite[username] = favorite
-    return "subscribed to {username}.\nto get the RSS file, call \n/favorites/{username}\n".format(username=username)
     
 def run():
     task.LoopingCall(poll_imgur).start(POLL_FREQUENCY)
