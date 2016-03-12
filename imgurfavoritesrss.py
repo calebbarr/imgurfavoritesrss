@@ -5,6 +5,7 @@ from twisted.internet import task
 from threading import Thread
 from imgurpython import ImgurClient
 import os,sys
+from datetime import datetime
 
 
 print = lambda x: sys.stdout.write("%s\n" % x)
@@ -37,8 +38,9 @@ def rss_item(img):
           <title>{title}</title>
           <link>{link}</link>
           <description>{description}</description>
+          <pubDate>{now}<pubDate>
         </item>
-    """.format(title=img.title,link=img.link,description=img.description )
+    """.format(title=img.title,link=img.link,description=img.description,now=datetime.now().strftime("%a, %d %b %Y %H:%M:%S %z"))
 
 def getLastFavorite(username):
     return client.get_gallery_favorites(username)[0]
