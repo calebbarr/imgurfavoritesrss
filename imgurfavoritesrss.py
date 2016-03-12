@@ -30,7 +30,7 @@ def poll_imgur(users=None):
         favorite = getLastFavorite(username)
         print("last favorite for {username}: {link}".format(username=username,link=favorite.link))
         if(favorite.link != favorites[username][-1].link):
-            print ("found new favorite for {username}: {link}").format(username=username,link=favorite.link)
+            print("found new favorite for {username}: {link}".format(username=username,link=favorite.link))
             latest_favorite[username].append(favorite)
     
 def rss_item(img):
