@@ -1,0 +1,7 @@
+{
+  "name": "imgur favorites rss",
+  "description": "creates an rss feed for any imgur user's favorites",
+  "repository": "https://github.com/calebbarr/imgurfavoritesrss",
+  "logo": "http://i.imgur.com/BSa65e1.jpg",
+  "keywords": ["imgur", "favorites", "rss", "slack"]
+}
