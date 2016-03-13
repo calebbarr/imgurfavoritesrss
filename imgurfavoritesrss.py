@@ -7,6 +7,8 @@ from imgurpython import ImgurClient
 import os,sys
 from datetime import datetime
 import pytz
+from itertools import dropwhile
+from utils import drop,dropright,tail
 
 
 print = lambda x: sys.stdout.write("%s\n" % x)
@@ -27,10 +29,9 @@ def poll_imgur(users=None):
     print("polling imgur")
     users = favorites.keys() if users is None else users
     for username in users:
-        favorite = fetchLastFavorite(username)
-        print("fetched last favorite for {username}: {link}".format(username=username,link=favorite.link))
-        if(favorite.link != favorites[username][-1].link):            
-            print("this is newer than {link}".format(link=favorites[username][-1].link))
+        new_favorites = fetch_new_favorites(username)
+        for favorite in new_favorites:
+            print("found new favorite for {username}: {link}".format(username=username,link=favorite.link))
             favorites[username].append(favorite)
     
 def rss_item(img):
@@ -42,11 +43,18 @@ def rss_item(img):
         </item>
     """.format(title=img.title,link=img.link,description=img.description,date=img.datetime)
 
-def fetchLastFavorite(username):
-    favorite = client.get_gallery_favorites(username)[0]
-    favorite.datetime = datetime.now(pytz.timezone('UTC')).strftime("%a, %d %b %Y %H:%M:%S %z")
-    favorite.link = favorite.link[:favorite.link.rfind(".")].replace("i.imgur.com","imgur.com")
-    return favorite
+    
+def fetch_favorites(username):
+    return [normalize_img(img) for img in client.get_gallery_favorites(username)]
+    
+def normalize_img(img):
+    img.datetime = datetime.now(pytz.timezone('UTC')).strftime("%a, %d %b %Y %H:%M:%S %z")
+    img.link = img.link[:img.link.rfind(".")].replace("i.imgur.com","imgur.com")
+    return img
+    
+def fetch_new_favorites(username):
+    last_favorite = (favorites[username])[-1]
+    return tail([ fave for fave in dropwhile(lambda img: img.link != last_favorite.link, fetch_favorites(username))])
     
 def initialize_rss_file(username):
     return """
