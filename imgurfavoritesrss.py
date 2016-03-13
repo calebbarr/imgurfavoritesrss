@@ -54,7 +54,7 @@ def normalize_img(img):
     
 def fetch_new_favorites(username):
     last_favorite = (favorites[username])[-1]
-    return tail([ fave for fave in dropwhile(lambda img: img.link != last_favorite.link, fetch_favorites(username))])
+    return tail([ fave for fave in dropwhile(lambda img: img.link != last_favorite.link, reversed(fetch_favorites(username)))])
     
 def initialize_rss_file(username):
     return """
@@ -74,7 +74,7 @@ def favorites_rss(username):
     else:
         poll_imgur([username])
     rss = initialize_rss_file(username)
-    return "\n".join(rss[:-3] + [rss_item(fave) for fave in favorites[username]] + rss[-3:] )
+    return "\n".join(rss[:-3] + [rss_item(fave) for fave in reversed(favorites[username])] + rss[-3:] )
 
 def subscribe(username):
     favorites[username] = [fetch_favorites(username)[0]]
