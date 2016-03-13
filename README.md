@@ -12,7 +12,7 @@ In Slack channel:
 
 ![random_channel](http://i.imgur.com/vgtYTtn.png)
 
-## deploy Your own
+## deploy your own
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
