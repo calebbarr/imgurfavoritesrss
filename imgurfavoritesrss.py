@@ -77,8 +77,7 @@ def favorites_rss(username):
     return "\n".join(rss[:-3] + [rss_item(fave) for fave in favorites[username]] + rss[-3:] )
 
 def subscribe(username):
-    favorite = fetchLastFavorite(username)
-    favorites[username] = [favorite]
+    favorites[username] = [fetch_favorites(username)[0]]
     
 def run():
     task.LoopingCall(poll_imgur).start(POLL_FREQUENCY)
