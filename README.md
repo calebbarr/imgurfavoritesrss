@@ -14,5 +14,7 @@ In Slack channel:
 
 ## deploy your own
 
+Make sure you `heroku config:set` both `IMGUR_CLIENT_ID` and `IMGUR_CLIENT_SECRET`.
+
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
